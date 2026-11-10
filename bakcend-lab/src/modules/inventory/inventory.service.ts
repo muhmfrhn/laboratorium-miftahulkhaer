@@ -149,6 +149,14 @@ export class InventoryService {
 
         if(!existingInventory) throw new ResponseError(404, `Inventory dengan id ${id} tidak ditemukan`);
 
+        // Inventory yang punya riwayat booking tidak boleh dihapus (relasi Restrict).
+        const bookingCount = await prisma.bookingInventori.count({
+            where: { inventoryId: id }
+        });
+        if(bookingCount > 0) {
+            throw new ResponseError(409, `Inventory dengan id ${id} masih punya ${bookingCount} riwayat booking`);
+        }
+
         // Hapus inventory otomatis mengurangi jumlah kategorinya (-1).
         await prisma.$transaction(async (tx) => {
             await tx.inventory.delete({ where: { id } });

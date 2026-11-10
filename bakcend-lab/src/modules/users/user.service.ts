@@ -35,12 +35,21 @@ export class UserService {
 
     static async update(currentUser: User, request: UpdateUserRequest): Promise<UserResponse> {
         const updateRequest = Validation.validate(UserValidation.UPDATE, request);
-        if(!updateRequest.name && !updateRequest.password) throw new ResponseError(400, "tidak boleh kosong");
 
-        const dataToUpdate: { name?: string; password?: string } = {};
+        const hasChanges =
+            updateRequest.name !== undefined ||
+            updateRequest.password !== undefined ||
+            updateRequest.foto !== undefined;
+        if (!hasChanges) throw new ResponseError(400, "tidak ada perubahan");
 
-        if(updateRequest.name) dataToUpdate.name = updateRequest.name;
-        if(updateRequest.password) dataToUpdate.password = await hashPassword(updateRequest.password);
+        const dataToUpdate: { name?: string; password?: string; foto?: string | null } = {};
+
+        if (updateRequest.name !== undefined) dataToUpdate.name = updateRequest.name;
+        if (updateRequest.password !== undefined) {
+            dataToUpdate.password = await hashPassword(updateRequest.password);
+        }
+        // null berarti hapus foto; string berarti simpan foto baru.
+        if (updateRequest.foto !== undefined) dataToUpdate.foto = updateRequest.foto;
 
         const updateUser = await prisma.user.update({
             where: { id: currentUser.id },

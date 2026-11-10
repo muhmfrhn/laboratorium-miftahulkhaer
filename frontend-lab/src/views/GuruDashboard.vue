@@ -6,23 +6,26 @@ import { GURU_MENU_ITEMS, type MenuKey } from '../lib/menu'
 import type { LoginData } from '../types/auth'
 import DashboardHome from './DashboardHome.vue'
 import PengajuanJadwal from './PengajuanJadwal.vue'
+import BookingInventori from './BookingInventori.vue'
 
 defineProps<{ user: LoginData }>()
 
-const emit = defineEmits<{ sessionExpired: []; logout: [] }>()
+const emit = defineEmits<{ sessionExpired: []; logout: []; openProfile: [] }>()
 
-type GuruMenu = 'dashboard' | 'jadwal'
+type GuruMenu = 'dashboard' | 'jadwal' | 'inventory'
 
 const activeMenu = ref<GuruMenu>('dashboard')
 const sidebarOpen = ref(false)
 const pengajuanView = ref<InstanceType<typeof PengajuanJadwal> | null>(null)
+const inventoriView = ref<InstanceType<typeof BookingInventori> | null>(null)
 
 function selectMenu(key: MenuKey) {
-  if (key === 'dashboard' || key === 'jadwal') activeMenu.value = key
+  if (key === 'dashboard' || key === 'jadwal' || key === 'inventory') activeMenu.value = key
 }
 
 function onRefresh() {
   if (activeMenu.value === 'jadwal') pengajuanView.value?.refresh()
+  if (activeMenu.value === 'inventory') inventoriView.value?.refresh()
 }
 </script>
 
@@ -36,6 +39,7 @@ function onRefresh() {
       :items="GURU_MENU_ITEMS"
       @select="selectMenu"
       @close="sidebarOpen = false"
+      @open-profile="emit('openProfile')"
       @logout="emit('logout')"
     />
     <div class="content">
@@ -51,9 +55,13 @@ function onRefresh() {
       </div>
       <Transition name="view-swap" mode="out-in">
         <DashboardHome v-if="activeMenu === 'dashboard'" key="dashboard" :user="user" :items="GURU_MENU_ITEMS" @select="selectMenu" />
-        <section v-else :key="activeMenu" class="view">
+        <section v-else-if="activeMenu === 'jadwal'" key="jadwal" class="view">
           <h2>Pengajuan Jadwal</h2>
           <PengajuanJadwal ref="pengajuanView" @session-expired="emit('sessionExpired')" />
+        </section>
+        <section v-else key="inventory" class="view">
+          <h2>Booking Inventori</h2>
+          <BookingInventori ref="inventoriView" @session-expired="emit('sessionExpired')" />
         </section>
       </Transition>
     </div>

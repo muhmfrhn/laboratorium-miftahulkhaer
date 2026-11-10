@@ -38,6 +38,13 @@ const ICONS: Record<MenuKey, string[]> = {
     'M15.6 3.4v3.2',
     'M4.6 10.2h14.8',
   ],
+  laporan: [
+    'M7.5 3.5h6.5l3.5 3.5v12.5a1.5 1.5 0 0 1-1.5 1.5h-8.5a1.5 1.5 0 0 1-1.5-1.5v-14.5a1.5 1.5 0 0 1 1.5-1.5z',
+    'M14 3.5V7h3.5',
+    'M8.5 11h6',
+    'M8.5 14.5h6',
+    'M8.5 18h3.5',
+  ],
 }
 
 const paths = computed(() => ICONS[props.name] ?? [])

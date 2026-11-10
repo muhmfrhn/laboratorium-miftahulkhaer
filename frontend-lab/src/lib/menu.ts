@@ -1,4 +1,11 @@
-export type MenuKey = 'dashboard' | 'users' | 'laboratorium' | 'category' | 'inventory' | 'jadwal'
+export type MenuKey =
+  | 'dashboard'
+  | 'users'
+  | 'laboratorium'
+  | 'category'
+  | 'inventory'
+  | 'jadwal'
+  | 'laporan'
 
 export interface MenuItem {
   key: MenuKey
@@ -13,12 +20,14 @@ export const MENU_ITEMS: MenuItem[] = [
   { key: 'category', label: 'Kategori', desc: 'Kategori + stok barang' },
   { key: 'inventory', label: 'Inventory', desc: 'Barang inventaris' },
   { key: 'jadwal', label: 'Jadwal', desc: 'Jadwal pemakaian lab' },
+  { key: 'laporan', label: 'Laporan', desc: 'Penggunaan lab per bulan' },
 ]
 
-// Menu khusus portal guru (pengajuan jadwal).
+// Menu khusus portal guru (pengajuan jadwal + booking inventori).
 export const GURU_MENU_ITEMS: MenuItem[] = [
   { key: 'dashboard', label: 'Dashboard', desc: 'Ringkasan' },
   { key: 'jadwal', label: 'Pengajuan Jadwal', desc: 'Ajukan pemakaian lab' },
+  { key: 'inventory', label: 'Booking Inventori', desc: 'Booking barang inventaris lab' },
 ]
 
 // Menu khusus portal siswa (read-only jadwal hari ini).

@@ -9,6 +9,8 @@ import { JadwalController } from "../modules/jadwal/jadwal.controller.ts";
 import { RutinController } from "../modules/rutin/rutin.controller.ts";
 import { SlotController } from "../modules/slot/slot.controller.ts";
 import { UsersController } from "../modules/users-management/users.controller.ts";
+import { BookingInventoriController } from "../modules/booking-inventori/booking-inventori.controller.ts";
+import { LaporanController } from "../modules/laporan/laporan.controller.ts";
 
 const privateApi = new Hono();
 
@@ -28,11 +30,18 @@ privateApi.post('/api/laboratorium', authMiddleware, roleMiddleware("teknisi"), 
 privateApi.patch('/api/laboratorium/:id', authMiddleware, roleMiddleware("teknisi"), LaboratoriumController.update);
 privateApi.delete('/api/laboratorium/:id', authMiddleware, roleMiddleware("teknisi"), LaboratoriumController.delete);
 
-// Inventory API
-privateApi.get('/api/inventory', authMiddleware, roleMiddleware("teknisi"), InventoryController.list);
+// Inventory API (guru read-only untuk memilih barang yang akan dibooking)
+privateApi.get('/api/inventory', authMiddleware, roleMiddleware("teknisi", "guru"), InventoryController.list);
 privateApi.post('/api/inventory', authMiddleware, roleMiddleware("teknisi"), InventoryController.create);
 privateApi.patch('/api/inventory/:id', authMiddleware, roleMiddleware("teknisi"), InventoryController.update);
 privateApi.delete('/api/inventory/:id', authMiddleware, roleMiddleware("teknisi"), InventoryController.delete);
+
+// Booking Inventori API (guru membooking per item, langsung aktif; teknisi memantau & menyelesaikan)
+privateApi.get('/api/booking-inventori', authMiddleware, roleMiddleware("teknisi", "guru"), BookingInventoriController.list);
+privateApi.get('/api/booking-inventori/:id', authMiddleware, roleMiddleware("teknisi", "guru"), BookingInventoriController.get);
+privateApi.post('/api/booking-inventori', authMiddleware, roleMiddleware("guru"), BookingInventoriController.create);
+privateApi.patch('/api/booking-inventori/:id/cancel', authMiddleware, roleMiddleware("guru", "teknisi"), BookingInventoriController.cancel);
+privateApi.patch('/api/booking-inventori/:id/finish', authMiddleware, roleMiddleware("teknisi"), BookingInventoriController.finish);
 
 // Category API (CRUD penuh, hanya teknisi)
 privateApi.get('/api/category', authMiddleware, roleMiddleware("teknisi"), CategoryController.list);
@@ -61,5 +70,9 @@ privateApi.get('/api/rutin', authMiddleware, roleMiddleware("teknisi"), RutinCon
 privateApi.post('/api/rutin', authMiddleware, roleMiddleware("teknisi"), RutinController.create);
 privateApi.patch('/api/rutin/:id', authMiddleware, roleMiddleware("teknisi"), RutinController.update);
 privateApi.delete('/api/rutin/:id', authMiddleware, roleMiddleware("teknisi"), RutinController.remove);
+
+// Laporan API (khusus teknisi): rekap penggunaan lab per bulan + export CSV
+privateApi.get('/api/laporan/penggunaan-lab', authMiddleware, roleMiddleware("teknisi"), LaporanController.penggunaanLab);
+privateApi.get('/api/laporan/penggunaan-lab/csv', authMiddleware, roleMiddleware("teknisi"), LaporanController.penggunaanLabCsv);
 
 export {privateApi}

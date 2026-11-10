@@ -7,7 +7,7 @@ import { cors } from 'hono/cors';
 
 const app = new Hono();
 
-const corsOrigins = (process.env.CORS_ORIGIN!)
+const corsOrigins = (process.env.CORS_ORIGIN! || "http://localhost:5173")
   .split(',')
   .map((s) => s.trim())
   .filter(Boolean);

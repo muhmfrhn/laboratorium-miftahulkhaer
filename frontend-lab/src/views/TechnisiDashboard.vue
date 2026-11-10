@@ -9,11 +9,12 @@ import DashboardHome from './DashboardHome.vue'
 import InventoryManagement from './InventoryManagement.vue'
 import JadwalManagement from './JadwalManagement.vue'
 import LaboratoriumManagement from './LaboratoriumManagement.vue'
+import LaporanPenggunaanLab from './LaporanPenggunaanLab.vue'
 import UsersManagement from './UsersManagement.vue'
 
 defineProps<{ user: LoginData }>()
 
-const emit = defineEmits<{ sessionExpired: []; logout: [] }>()
+const emit = defineEmits<{ sessionExpired: []; logout: []; openProfile: [] }>()
 
 const activeMenu = ref<MenuKey>('dashboard')
 const sidebarOpen = ref(false)
@@ -22,6 +23,7 @@ const labView = ref<InstanceType<typeof LaboratoriumManagement> | null>(null)
 const categoryView = ref<InstanceType<typeof CategoryManagement> | null>(null)
 const inventoryView = ref<InstanceType<typeof InventoryManagement> | null>(null)
 const jadwalView = ref<InstanceType<typeof JadwalManagement> | null>(null)
+const laporanView = ref<InstanceType<typeof LaporanPenggunaanLab> | null>(null)
 
 function selectMenu(key: MenuKey) {
   activeMenu.value = key
@@ -33,6 +35,7 @@ function onRefresh() {
   if (activeMenu.value === 'category') categoryView.value?.refresh()
   if (activeMenu.value === 'inventory') inventoryView.value?.refresh()
   if (activeMenu.value === 'jadwal') jadwalView.value?.refresh()
+  if (activeMenu.value === 'laporan') laporanView.value?.refresh()
 }
 </script>
 
@@ -45,6 +48,7 @@ function onRefresh() {
       :open="sidebarOpen"
       @select="selectMenu"
       @close="sidebarOpen = false"
+      @open-profile="emit('openProfile')"
       @logout="emit('logout')"
     />
     <div class="content">
@@ -79,6 +83,10 @@ function onRefresh() {
         <section v-else-if="activeMenu === 'jadwal'" :key="activeMenu" class="view">
           <h2>Jadwal</h2>
           <JadwalManagement ref="jadwalView" @session-expired="emit('sessionExpired')" />
+        </section>
+        <section v-else-if="activeMenu === 'laporan'" :key="activeMenu" class="view">
+          <h2>Laporan Penggunaan Lab</h2>
+          <LaporanPenggunaanLab ref="laporanView" @session-expired="emit('sessionExpired')" />
         </section>
       </Transition>
     </div>

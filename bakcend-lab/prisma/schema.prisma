@@ -28,6 +28,7 @@ model User {
   email String @unique
   password String
   name String?
+  foto String? @db.MediumText
   role Roles
   status Status
   token String? 
@@ -36,6 +37,7 @@ model User {
   createdSlots JadwalSlot[] @relation("SlotCreator")
   bookedSlots JadwalSlot[] @relation("SlotBooker")
   createdRutins JadwalRutin[] @relation("RutinCreator")
+  bookings BookingInventori[] @relation("InventoriBooker")
 
   @@map("users")
 }
@@ -89,6 +91,8 @@ model Inventory {
 
   categoryId Int
   category  Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  bookings BookingInventori[]
 }
 
 enum StatusJadwal {
@@ -165,4 +169,32 @@ model JadwalSlot {
   rutin JadwalRutin? @relation(fields: [rutinId], references: [id], onDelete: SetNull)
 
   @@map("jadwal_slot")
+}
+
+enum StatusBookingInventori {
+  DIBOOKING
+  SELESAI
+  BATAL
+}
+
+model BookingInventori {
+  id         Int      @id @default(autoincrement())
+  keperluan  String
+  catatan    String?
+  tglmulai   DateTime
+  tglselesai DateTime
+  status     StatusBookingInventori @default(DIBOOKING)
+  bookedAt   DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  inventoryId Int
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Restrict)
+
+  userId Int
+  user   User @relation("InventoriBooker", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryId, status, tglmulai, tglselesai])
+  @@index([userId])
+  @@map("booking_inventori")
 }

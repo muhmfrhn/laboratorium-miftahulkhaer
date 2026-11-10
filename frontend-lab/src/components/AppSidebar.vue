@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { MENU_ITEMS, type MenuItem, type MenuKey } from '../lib/menu'
 import type { LoginData } from '../types/auth'
 import MenuIcon from './MenuIcon.vue'
+import UserAvatar from './UserAvatar.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -18,14 +19,8 @@ const emit = defineEmits<{
   select: [key: MenuKey]
   close: []
   logout: []
+  openProfile: []
 }>()
-
-const initials = computed(() => {
-  const source = (props.user.name ?? props.user.email ?? '?').trim()
-  const parts = source.split(/[\s.@_-]+/).filter(Boolean)
-  const value = parts.length > 1 ? parts[0][0] + parts[1][0] : source.slice(0, 2)
-  return value.toUpperCase()
-})
 
 const panelLabel = computed(() => `Panel ${props.user.role}`)
 </script>
@@ -65,13 +60,22 @@ const panelLabel = computed(() => `Panel ${props.user.role}`)
     </nav>
 
     <div class="foot">
-      <div class="who-card">
-        <span class="avatar">{{ initials }}</span>
+      <button
+        type="button"
+        class="who-card"
+        aria-label="Buka profil pengguna"
+        title="Buka profil pengguna"
+        @click="emit('openProfile'); emit('close')"
+      >
+        <UserAvatar :name="user.name" :email="user.email" :foto="user.foto" :size="34" />
         <span class="who-text">
-          <p class="who">{{ user.name ?? user.email }}</p>
-          <p class="role">{{ user.role }}</p>
+          <span class="who">{{ user.name ?? user.email }}</span>
+          <span class="role">{{ user.role }}</span>
         </span>
-      </div>
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 6 6 6-6 6" />
+        </svg>
+      </button>
       <button class="btn logout" @click="emit('logout')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M9.5 4.5H6.6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h2.9" />
@@ -227,29 +231,45 @@ nav {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 9px 10px;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--field);
+  color: var(--muted);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
   min-width: 0;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: #fff;
-  background: linear-gradient(140deg, var(--brand-2), var(--brand));
+.who-card:hover {
+  background: var(--card);
+  border-color: rgba(109, 90, 224, 0.4);
+  transform: translateY(-1px);
+}
+.who-card:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 .who-text {
   display: grid;
   gap: 1px;
   min-width: 0;
+  flex: 1;
+}
+.chev {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  color: var(--muted);
+  opacity: 0.7;
+  transition: transform 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+}
+.who-card:hover .chev {
+  transform: translateX(2px);
+  color: var(--brand-ink);
+  opacity: 1;
 }
 .who {
   margin: 0;

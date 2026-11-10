@@ -9,7 +9,7 @@ import SiswaJadwalHariIni from './SiswaJadwalHariIni.vue'
 
 defineProps<{ user: LoginData }>()
 
-const emit = defineEmits<{ sessionExpired: []; logout: [] }>()
+const emit = defineEmits<{ sessionExpired: []; logout: []; openProfile: [] }>()
 
 type SiswaMenu = 'dashboard' | 'jadwal'
 
@@ -36,6 +36,7 @@ function onRefresh() {
       :items="SISWA_MENU_ITEMS"
       @select="selectMenu"
       @close="sidebarOpen = false"
+      @open-profile="emit('openProfile')"
       @logout="emit('logout')"
     />
     <div class="content">

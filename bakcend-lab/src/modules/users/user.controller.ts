@@ -16,12 +16,10 @@ export class UserConntroller {
     }
 
     static async update(c: Context<{Variables: {user: User}}>) {
-        try {
-            const currentUser = c.get("user")
-            const request: UpdateUserRequest = await c.req.json();
-            const response = await UserService.update(currentUser, request)
-            return c.json({data: response})
-        }catch{}
+        const currentUser = c.get("user")
+        const request: UpdateUserRequest = await c.req.json();
+        const response = await UserService.update(currentUser, request)
+        return c.json({data: response})
     }
 
     static async logout(c: Context<{Variables: {user: User}}>) {
